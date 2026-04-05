@@ -1,0 +1,42 @@
+Metadata-Version: 2.4
+Name: manim-server
+Version: 0.1.0
+Summary: FastAPI service that renders Manim scenes and returns the resulting MP4.
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi
+Requires-Dist: manim
+Requires-Dist: uvicorn[standard]
+
+# manim-server
+
+Minimal FastAPI service for rendering Manim scenes and returning an MP4 in a single request.
+
+## Setup
+
+```bash
+source .venv/bin/activate
+pip install -e .
+```
+
+## Run
+
+Because the main file is named `manim-test.py`, run it with an import-by-path launcher:
+
+```bash
+python -c "import importlib.util; import uvicorn; spec = importlib.util.spec_from_file_location('manim_test_app', 'manim-test.py'); module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module); uvicorn.run(module.app, host='127.0.0.1', port=8000)"
+```
+
+## Endpoint
+
+`POST /render`
+
+Request body:
+
+```json
+{
+  "code": "from manim import *\n\nclass MainScene(Scene):\n    def construct(self):\n        self.play(Write(Text('Hello')))\n",
+  "scene_name": "MainScene",
+  "quality": "m"
+}
+```

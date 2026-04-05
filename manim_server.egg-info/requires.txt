@@ -1,0 +1,3 @@
+fastapi
+manim
+uvicorn[standard]

@@ -1,0 +1,15 @@
+[project]
+name = "manim-server"
+version = "0.1.0"
+description = "FastAPI service that renders Manim scenes and returns the resulting MP4."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi",
+    "manim",
+    "uvicorn[standard]",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"

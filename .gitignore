@@ -1,0 +1,10 @@
+.venv/
+output.mp4
+/fonts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+dist/
+build/

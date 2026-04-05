@@ -1,0 +1,250 @@
+from manim import *
+import numpy as np
+
+class MainScene(Scene):
+    def construct(self):
+        self.camera.background_color = BLACK
+        circle_radius = 2.8
+        main_circle = Circle(radius=circle_radius, color=WHITE, stroke_width=4)
+        center = main_circle.get_center()
+
+        # Title band at top
+        title = Text("π Is Irrational: Rotating Around the Circle", font="SF Pro Display", font_size=40, color=WHITE)
+        title.to_edge(UP).shift(DOWN*0.22)
+        self.add(title)
+
+        # Subtitle band at bottom
+        subtitle = Text("What happens when we rotate by π?", font="SF Pro Text", font_size=28, color=WHITE)
+        subtitle.to_edge(DOWN).shift(UP*0.27)
+        self.add(subtitle)
+
+        self.wait(1)
+        # Introduction
+        intro = Text(
+            "If π were rational, rotations would eventually repeat.",
+            font="SF Pro Text", font_size=25, color=WHITE,
+        )
+        intro.to_edge(LEFT).shift(RIGHT*0.35 + UP*0.1)
+        self.play(FadeIn(intro))
+        self.wait(2)
+
+        self.play(FadeIn(main_circle))
+
+        # Definition: Rotation by angle θ
+        theta_label = Text(
+            "Rotation angle: θ", font="SF Pro Text", font_size=24, color=WHITE
+        )
+        theta_label.to_edge(RIGHT).shift(LEFT*0.5 + DOWN*0.35)
+        self.play(FadeIn(theta_label))
+        self.wait(1)
+
+        # Show initial point
+        start_dot = Dot(
+            main_circle.point_from_proportion(0), radius=0.13,
+            color=WHITE
+        )
+        start_label = Text("Start", font="SF Pro Text", font_size=22, color=WHITE)
+        start_label.next_to(start_dot, LEFT, buff=0.18)
+        self.play(FadeIn(start_dot), FadeIn(start_label))
+        self.wait(1)
+
+        # Rational angle demo: θ = π/3
+        rational_angle = np.pi / 3
+        rational_text = Text(
+            "First, a rational angle: θ = π⁄3",
+            font="SF Pro Text", font_size=24, color=WHITE,
+        )
+        rational_text.to_corner(UL).shift(DOWN*0.5 + RIGHT*0.2)
+        self.play(FadeIn(rational_text), FadeOut(intro))
+        self.wait(0.8)
+
+        rational_dots = VGroup()
+        rational_steps = 6
+        accent_colors = [BLUE, YELLOW, RED]
+        for i in range(rational_steps):
+            proportion = (rational_angle*i) / (2*np.pi)
+            dot = Dot(
+                main_circle.point_from_proportion(proportion),
+                radius=0.11,
+                color=accent_colors[i%3]
+            )
+            rational_dots.add(dot)
+        rational_path = VGroup()
+        for i in range(rational_steps):
+            if i > 0:
+                line = Line(
+                    rational_dots[i-1].get_center(),
+                    rational_dots[i].get_center(),
+                    color=GRAY, stroke_width=2
+                )
+                rational_path.add(line)
+        self.play(
+            LaggedStart(
+                *[FadeIn(dot) for dot in rational_dots],
+                *[Create(line) for line in rational_path],
+                lag_ratio=0.15, run_time=2.3
+            )
+        )
+        self.wait(1.2)
+
+        closed_text = Text(
+            "Rotating by π⁄3 closes after 6 steps."
+                " The orbit repeats!",
+            font="SF Pro Text", font_size=24, color=WHITE
+        )
+        closed_text.to_corner(UL).shift(DOWN*0.98 + RIGHT*0.22)
+        self.play(FadeIn(closed_text))
+        self.wait(1.7)
+
+        self.play(
+            *[FadeOut(obj) for obj in [rational_text, rational_dots, rational_path, closed_text]],
+            run_time=1.3
+        )
+        self.wait(0.4)
+
+        # Irrational angle: θ = π
+        pi_text = Text(
+            "Now, rotate by π (irrational)",
+            font="SF Pro Text", font_size=24, color=WHITE
+        )
+        pi_text.to_corner(UL).shift(DOWN*0.48 + RIGHT*0.18)
+        self.play(FadeIn(pi_text))
+        self.wait(1)
+
+        # Show two dots: start and after π
+        pi_dot1 = Dot(
+            main_circle.point_from_proportion(0), radius=0.13,
+            color=WHITE
+        )
+        pi_dot2 = Dot(
+            main_circle.point_from_proportion(0.5), radius=0.13,
+            color=RED
+        )
+        pi_label1 = Text("Start", font="SF Pro Text", font_size=22, color=WHITE)
+        pi_label1.next_to(pi_dot1, LEFT, buff=0.18)
+        pi_label2 = Text("π", font="SF Pro Text", font_size=22, color=RED)
+        pi_label2.next_to(pi_dot2, RIGHT, buff=0.18)
+
+        self.play(FadeIn(pi_dot1), FadeIn(pi_dot2), FadeIn(pi_label1), FadeIn(pi_label2))
+        self.wait(1.1)
+
+        # Explain: only positions 0 and π coincide, others never repeat
+        explanation = Text(
+            "With θ = π, each step flips to the opposite side.\n"
+            "But the orbit does NOT close up: no periodic pattern!",
+            font="SF Pro Text", font_size=23, color=WHITE
+        )
+        explanation.to_corner(UL).shift(DOWN*1.1 + RIGHT*0.18)
+        self.play(FadeIn(explanation))
+        self.wait(1.5)
+
+        # Demo: Rotate by θ = π, show flipping
+        pi_flip_dots = VGroup(pi_dot1, pi_dot2)
+        pi_flip_labels = VGroup(pi_label1, pi_label2)
+        flip_line = Line(
+            pi_dot1.get_center(), pi_dot2.get_center(), color=RED, stroke_width=3
+        )
+        self.play(Create(flip_line))
+        self.wait(0.7)
+
+        # Now, demonstrate rotating by θ = π × irrational fraction
+        approx_angle = np.pi * np.sqrt(2) / 2 # highly irrational
+        approx_text = Text(
+            "Try θ ≈ π·√2⁄2: still irrational",
+            font="SF Pro Text", font_size=23, color=WHITE
+        )
+        approx_text.to_corner(UL).shift(DOWN*1.48 + RIGHT*0.16)
+        self.play(FadeIn(approx_text), FadeOut(explanation), FadeOut(pi_flip_labels), FadeOut(pi_flip_dots), FadeOut(flip_line))
+        self.wait(0.9)
+
+        k_steps = 16
+        irrational_dots = VGroup()
+        for k in range(k_steps):
+            proportion = (approx_angle * k) / (2 * np.pi)
+            proportion = proportion % 1
+            dot = Dot(
+                main_circle.point_from_proportion(proportion),
+                radius=0.09,
+                color=YELLOW if k % 7 == 0 else BLUE
+            )
+            irrational_dots.add(dot)
+        # Animate sequence
+        self.play(
+            LaggedStart(
+                *[FadeIn(dot) for dot in irrational_dots],
+                lag_ratio=0.13, run_time=2.6
+            )
+        )
+        self.wait(1.2)
+
+        non_repeat_text = Text(
+            "No matter how many steps,\n"
+            "the orbit never closes or repeats.",
+            font="SF Pro Text", font_size=21, color=WHITE
+        )
+        non_repeat_text.to_edge(DOWN).shift(UP*0.9)
+        self.play(FadeIn(non_repeat_text))
+        self.wait(2)
+
+        # Core theorem explanation
+        theorem_text = Text(
+            "THEOREM: If θ/(2π) is irrational,\n"
+            "rotating by θ fills the circle densely,\n"
+            "never repeating any position.",
+            font="SF Pro Text", font_size=23, color=WHITE
+        )
+        theorem_text.to_edge(LEFT).shift(RIGHT*0.22 + UP*0.15)
+        self.play(FadeIn(theorem_text))
+        self.wait(2)
+
+        # Visualize dense filling: show many dots
+        dense_steps = 42
+        dense_dots = VGroup()
+        for k in range(dense_steps):
+            proportion = (approx_angle * k) / (2 * np.pi)
+            proportion = proportion % 1
+            dot = Dot(
+                main_circle.point_from_proportion(proportion),
+                radius=0.065,
+                color=WHITE
+            )
+            dense_dots.add(dot)
+        self.play(
+            FadeOut(irrational_dots),
+            FadeIn(dense_dots),
+            run_time=1.2
+        )
+        self.wait(1.3)
+
+        dense_text = Text(
+            "A rotation by an irrational angle eventually comes arbitrarily close\n"
+            "to every point on the circle.",
+            font="SF Pro Text", font_size=22, color=WHITE
+        )
+        dense_text.to_edge(RIGHT).shift(LEFT*0.2 + DOWN*0.76)
+        self.play(FadeIn(dense_text))
+        self.wait(2)
+
+        # Final conclusion and summary
+        conclusion = Text(
+            "π's irrationality makes circle rotations non-periodic.\n"
+            "Its orbit is dense and never repeats.",
+            font="SF Pro Text", font_size=26, color=WHITE
+        )
+        conclusion.to_edge(DOWN).shift(UP*0.35)
+
+        summary = Text(
+            "This is a deep property:\n"
+            "Irrational numbers like π disrupt cycles and \n"
+            "create infinite, non-repeating mathematical structure.",
+            font="SF Pro Text", font_size=22, color=WHITE
+        )
+        summary.to_edge(RIGHT).shift(LEFT*0.21 + DOWN*0.2)
+        self.play(FadeIn(conclusion), FadeIn(summary))
+        self.wait(3.5)
+
+        self.play(*[FadeOut(m) for m in [main_circle, dense_dots, dense_text, theorem_text, conclusion, summary, subtitle, theta_label]])
+        outro = Text("Irrationality matters: π reshapes the world of rotations.", font="SF Pro Text", font_size=28, color=WHITE)
+        outro.to_edge(DOWN)
+        self.play(FadeIn(outro))
+        self.wait(2.25)
